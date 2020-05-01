@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>COMP 20 - HW 8</title>
+	<meta charset="utf-8">
+	<style>
+		html, body {
+			background-color: white;
+			margin: 0;
+			padding: 0;
+		}
+		* {
+			box-sizing: border-box;
+		}
+
+		.square {
+			width: 100%;
+			height: 100%;
+			margin-top: -2.5px;
+			margin-bottom: -2.5px;
+			/*background-color: none;*/
+		}
+
+		.col {
+			display: inline-block;
+		}
+		.board {
+			margin-top: 5%;
+			text-align: center;
+			width: 100%;
+		}
+
+		.settings {
+			text-align: center;
+		}
+
+		.winner {
+			text-align: center;
+		}
+
+		.icon {
+			padding: 0px;
+			border: 0px;
+			text-align: center;
+		}
+
+
+		.column {
+			float: left;
+			width: 15%;
+			padding: 10px;
+		}
+		.icons:after {
+			content: "";
+			display: table;
+			clear: both;
+		}
+		.turn {
+			font-size: 15px;
+			font-weight: bold;
+		}
+	</style>
+
+
+	<script type="text/javascript">
+		var board;
+		var turn = "red";
+		var board_row = 6;
+		var board_col = 7;
+		var target = 4;
+		var num_players = 2;
+		var gameOver = false;
+		var player_finished = true;
+
+		function showCol(elem) {
+			elem.style.backgroundColor = "lightblue";
+		}
+
+		function hideCol(elem) {
+			elem.style.backgroundColor = "transparent";
+		}
+
+		initalizeBoard();
+	</script>
+	<!-- onmouseover="document.body.style.backgroundColor ='orange'" -->
+
+</head>
+<body>
+	<h1 align="center"> Connect Four </h1>
+
+	<div id="settings">
+		<h3 align="center"> Game Settings: </h3>
+		<form name="settings" class="settings" style="display: block">
+			Number of Columns: &nbsp;
+			<script language="javascript">
+				document.write ('<input type="number" name="column_number" id="column_number" value="7"><br><br>');
+			</script>
+			Number of Rows: &nbsp;
+			<script language="javascript">
+				document.write ('<input type="number" name="row_number" id="row_number" value="6"><br><br>');
+			</script>
+			Goal to Win: &nbsp;
+			<script language="javascript">
+				document.write ('<input type="number" name="target" id="target" value="4"><br><br>');
+			</script>
+			Number of Players: &nbsp;
+			<script language="javascript">
+				document.write ('<select id="players" name="players"><option value ="1">1</option><option value ="2">2</option></select>');
+			</script>
+
+			<br /><br />
+			<input type="button" value = "Play Game" onclick ="buildBoardImage();">
+		</form>
+	</div>
+	<div>
+		<div class="column" id="red-player">
+			<div class = "icon" id = "icon1" style="float: left; margin-left: 10%; display: none;"><img src="red_icon.png" alt="board" style="width: 20%"></div><br>
+			<div class = "winner" id="win_message_red"></div>
+			<div class = "your_turn" id="your_turn" style="text-align: center; display: none; font-size: 10px;"><br>Your Turn</div>
+		</div>
+		<div class="column" style="width: 70%">
+			<div class = "board" id="board"></div>
+			<p id = "choosing_player" style="text-align: center; display: none; font-size: 30px;"> randomly choosing starter </p>
+		</div>
+		<div class="column" id="black-player">
+			<div class = "icon" id ="icon2" style="float: right; margin-right: 10%; display: none"><img src="black_icon.png" alt="board" style="width: 20%"></div><br>
+			<div class = "winner" id="win_message_black"></div>
+		</div>
+
+	</div>
+
+
+	<br><br><br><br>
+	<div id="print_board" align="center" style="width: 100%; display: block"> </div>
+
+	<script type="text/javascript">
+		function initalizeBoard(){
+			board = new Array(board_col);
+
+			for (var i = 0; i < board_col; i++) {
+				board[i] = new Array(board_row);
+			}
+			for(var i = 0; i < board_row; i++) {
+				for(var x = 0; x < board_col; x++) {
+					board[x][i] = 0;
+				}
+			}
+		}
+
+		function buildBoardImage() {
+			board_col = parseInt(document.settings.column_number.value);
+			board_row = parseInt(document.settings.row_number.value);
+			target = parseInt(document.settings.target.value);
+			num_players = parseInt(document.settings.players.value);
+
+			if(target > board_col || target > board_row) {
+				alert("Error: Goal to Win must be smaller than size of board");
+				return;
+			}
+
+      document.getElementById('settings').style.display = 'none'; //hide form
+      pick_starter();
+      // document.getElementById('red-player').style.backgroundColor = '#ffcccc';
+      document.getElementById('icon1').style.display = 'block';
+      document.getElementById('icon2').style.display = 'block';
+       document.getElementById('choosing_player').style.display = 'block';
+
+	document.getElementById('board').style.display = 'none';
+
+      initalizeBoard();
+
+      gameOver = false;
+
+      var board_columns = "";
+      var w = (50/board_col);
+      var t = w.toString()+"%";
+
+      for(var x = 0; x < board_col; x++){
+      	board_columns += '<div class = "col" id = "board'+x+'" onmouseover="showCol(this)" onmouseout="hideCol(this)" onclick="setTimeout(move, 20, this)" style="width:'+t+'"></div>';
+      }
+      document.getElementById("board").innerHTML = board_columns;
+
+      for(var x = 0; x < board_col; x++){
+      	var image = "";
+      	for (var i = 0; i < board_row; i++) {
+      		image += '<img class="square" id="square" src="square.png" alt="board"><br>';
+      	}
+      	var board_num = "board" + parseInt(x);
+      	document.getElementById(board_num).innerHTML = image;
+      }
+
+      document.getElementById("turn").style.marginLeft = '20%';
+  }
+
+  function printBoard(board_name){
+  	var b = "";
+  	for(var i = 0; i < board_row; i++) {
+  		for(var x = 0; x < board_col; x++) {
+  			if(board_name[x][i] == 0) b += "_ "
+  			else b += board_name[x][i].toString() + " ";
+  		}
+  		b += "<br>";
+  	}
+  	document.getElementById("print_board").innerHTML = b;
+  }
+
+  function check_vertical(){
+      for(var x = 0; x < board_col; x++){ //columns
+      	var connected = 1;
+      	for (var i = 1; i < board_row; i++) {
+      		if(board[x][i] == board[x][i-1] && board[x][i] != 0) connected++;
+      		else connected = 1;
+      	}
+      	if(connected >= target) return true;
+      }
+      return false;
+  }
+
+  function check_horizontal(){
+      for (var i = 0; i < board_row; i++) {//rows
+      	var connected = 1;
+      	for(var x = 1; x < board_col; x++){
+      		if(board[x][i] == board[x-1][i] && board[x][i] != 0) {
+      			connected++;
+      			if(connected >= target) return true;
+      		}
+      		else connected = 1;
+      	}
+      }
+      return false;
+  }
+  function check_TopRight_To_BottomLeft(){
+      for(var x = 0; x < board_col; x++){ //rows top
+      	rows = 0;
+      	cols = x;
+      	var connected = 1;
+
+      	for (var i = 0; i < board_row; i++) {
+      		if(cols < 1 || rows >= board_row-1) continue;
+      		else if(board[cols][rows] == board[cols-1][rows+1] && board[cols][rows] != 0) connected++;
+      		else connected = 1;
+      		rows++
+      		cols--;
+      	}
+      	if(connected >= target) return true;
+      }
+
+      for(var x = 0; x < board_row; x++){ //rows side
+      	rows = x;
+      	cols = board_col-1;
+      	var connected = 1;
+
+      	for (var i = 0; i < board_col; i++) {
+      		if(cols < 1 || rows >= board_row-1) continue;
+      		else if(board[cols][rows] == board[cols-1][rows+1] && board[cols][rows] != 0) connected++;
+      		else connected = 1;
+      		rows++
+      		cols--;
+      	}
+      	if(connected >= target) return true;
+      }
+      return false;
+  }
+  function check_TopLeft_To_BottomRight(){
+      for(var x = 0; x < board_col; x++){ //rows top
+      	rows = 0;
+      	cols = x;
+      	var connected = 1;
+
+      	for (var i = 0; i < board_row; i++) {
+      		if(cols >= board_col-1 || rows >= board_row-1) continue;
+      		else if(board[cols][rows] == board[cols+1][rows+1] && board[cols][rows] != 0) connected++;
+      		else connected = 1;
+      		rows++;
+      		cols++;
+      	}
+      	if(connected >= target) return true;
+      }
+
+      for(var x = 0; x < board_row; x++){ //rows top
+      	rows = x;
+      	cols = 0;
+      	var connected = 1;
+
+      	for (var i = 0; i < board_col; i++) {
+      		if(cols >= board_col-1 || rows >= board_row-1) continue;
+      		else if(board[cols][rows] == board[cols+1][rows+1] && board[cols][rows] != 0) connected++;
+      		else connected = 1;
+      		rows++;
+      		cols++;
+      	}
+      	if(connected >= target) return true;
+      }
+      return false;
+  }
+
+  function checkWin(){
+  	var win = false;
+
+  	win = check_vertical() | check_horizontal() | check_TopLeft_To_BottomRight() | check_TopRight_To_BottomLeft();
+  	return win;
+  }
+
+  function move(elem){
+
+  	if(gameOver == true) return;
+  	if(player_finished == false) return;
+  	var col_num = parseInt(elem.id.substring(5, elem.id.length));
+  	var num_turn = 1;
+  	if(turn == "black") num_turn = 2;
+  	for (var i = 0; i < board_row; i++) {
+  		if(board[col_num][i] != 0 && i == 0) {
+  			alert("invalid move");
+  			return;
+  		}
+  		else if(i == board_row-1 && board[col_num][i] == 0) {
+  			board[col_num][i] = num_turn;
+  			break;
+  		}
+  		else if(board[col_num][i] != 0){
+  			board[col_num][i-1] = num_turn;
+  			break;
+  		}
+  	}
+  	var image = "";
+  	var squares = 0;
+  	for (var x = 0; x < board_row; x++) {
+  		if(board[col_num][x] == 1) {
+  			image += '<img class="square" id="square" src="square.png" alt="board" style="background-color: red"><br>';
+  			squares++;
+  		}
+  		else if(board[col_num][x] == 2) {
+  			image += '<img class="square" id="square" src="square.png" alt="board" style="background-color: black"><br>';
+  			squares++;
+  		}
+  		else image += '<img class="square" id="square" src="square.png" alt="board" style="background-color: transparent"><br>';
+  	}
+  	document.getElementById(elem.id).innerHTML = image;
+
+  	if(checkWin()) return won();
+       var tie = true;
+       for(var x = 0; x < board_row; x++){
+       	for (var i = 0; i < board_col; i++) {
+       		if(board[i][x] == 0) {
+       			tie = false;
+       		}
+       	}
+       }
+       if(tie == true) tie_game();
+
+       if(turn == "red") {
+       	turn = "black";
+       	document.getElementById('red-player').style.backgroundColor = 'white';
+       	document.getElementById('black-player').style.backgroundColor = '#d9d9d9';
+       	document.getElementById('your_turn').style.display = 'none';
+       	if(num_players == 1) {
+       		player_finished = false;
+       		return setTimeout(computer_move, 200);
+       	}
+       }
+       else {
+       	turn = "red";
+       	document.getElementById('red-player').style.backgroundColor = '#ffcccc';
+       	document.getElementById('black-player').style.backgroundColor = 'white';
+       }
+   }
+
+   function computer_move(){
+   		var col_to_move = getRand(1, board_col);
+   		if(defensive_vertical(1) != -1) {
+   			col_to_move = defensive_vertical(1);
+   		}
+   		 else if(defensive_diagonal() != -1) {
+   			col_to_move = defensive_diagonal();
+   		}
+   		else if(defensive_horizontal(1) != -1) {
+   			col_to_move = defensive_horizontal(1);
+   		}
+
+   		if(defensive_vertical(2) != -1) {
+   			col_to_move = defensive_vertical(2);
+   		}
+   		 else if(defensive_diagonal() != -1) {
+   			col_to_move = defensive_diagonal();
+   		}
+   		else if(defensive_horizontal(2) != -1) {
+   			col_to_move = defensive_horizontal(2);
+   		}
+
+   		if(move_in_col(col_to_move) == -10) computer_move();
+   		player_finished = true;
+   }
+
+   function defensive_vertical(color){
+      for(var x = 0; x < board_col; x++){ //columns
+      	var connected = 1;
+      	for (var i = board_row-1; i >= 0; i--) {
+      		if(board[x][i] == board[x][i+1] && board[x][i] == color) {
+      			connected++;
+      			if(connected >= target-1 && i != 0) {
+      				if(board[x][i-1] == 0) return x;
+      			}
+      		}
+      		else connected = 1;
+      	}
+      }
+      return -1;
+   }
+
+   function defensive_horizontal(color){
+      for (var i = 0; i < board_row; i++) {//rows
+      	var connected = 0;
+      	for(var x = 1; x < board_col; x++){
+      		if(board[x][i] == board[x-1][i] && board[x][i] == color) {
+      			connected++;
+      			if(connected >= target-1 && x != board_col-1 && board[x+1][i] == 0 && (i == board_row-1 || board[x+1][i+1] != 0))
+      				return x+1;
+      			else if(connected >= target-1 && board[x-3][i] == 0 && (i == board_row-1 || board[x+1][i+1] != 0))
+      				return x-3;
+      			else if(connected == target-2 && x != board_col-1){
+      				if(board[x+1][i] == 0 && board[x-2][i] == 0 && (i == board_row-1 || board[x+1][i+1] != 0))return x+1;
+      			}
+      		}
+      		else if(board[x][i] == 0) connected = 0;
+      		else if(board[x][i] == color) connected++;
+      		else connected = 0;
+      	}
+      }
+      return -1;
+  	}
+
+  	function defensive_diagonal(){
+  		if(defensive_TopRight_To_BottomLeft() != -1) {
+  			return defensive_TopRight_To_BottomLeft();
+  		}
+  		else if(defensive_TopLeft_To_BottomRight() != -1) {
+  			return defensive_TopLeft_To_BottomRight();
+  		}
+  		else return -1;
+  	}
+
+  	function defensive_TopRight_To_BottomLeft(){
+
+      for(var x = 0; x < board_col; x++){ //rows top
+      	rows = 0;
+      	cols = x;
+      	var connected = 0;
+
+      	for (var i = 0; i < board_row; i++) {
+      		if(cols < 1 || rows >= board_row-1) continue;
+      		else if(board[cols][rows] == board[cols-1][rows+1] && board[cols][rows] != 0) connected++;
+      		else connected = 1;
+      		rows++
+      		cols--;
+      	}
+      	if(connected >= target-1) {
+      		if(rows < board_row-1 && cols >= 0){
+      			if(board[cols][rows] == 0 && board[cols][rows+1] != 0) return cols;
+      		}
+      		else if(rows == board_row-1 && cols >= 0){
+      			if(board[cols][rows] == 0) return cols;
+      		}
+      		if(cols < (board_col-3) && rows >= 3){
+      			if(board[cols+3][rows-3] == 0){
+      				if(board[cols+3][rows-2] != 0) return cols+3;
+      			}
+      		}
+      	}
+      }
+
+      for(var x = 0; x < board_row; x++){ //rows side
+      	rows = x;
+      	cols = board_col-1;
+      	var connected = 1;
+
+      	for (var i = 0; i < board_col; i++) {
+      		if(cols < 1 || rows >= board_row-1) continue;
+      		else if(board[cols][rows] == board[cols-1][rows+1] && board[cols][rows] != 0) connected++;
+      		else connected = 1;
+      		rows++
+      		cols--;
+      	}
+      	if(connected >= target-1) {
+      		if(rows < board_row-1 && cols >= 0){
+      			if(board[cols][rows] == 0 && board[cols][rows+1] != 0) return cols;
+      		}
+      		else if(rows == board_row-1 && cols >= 0){
+      			if(board[cols][rows] == 0) return cols;
+      		}
+      		if(cols < (board_col-3) && rows >= 3){
+      			if(board[cols+3][rows-3] == 0){
+      				if(board[cols+3][rows-2] != 0) return cols+3;
+      			}
+      		}
+      	}
+      }
+      return -1;
+  }
+
+  function defensive_TopLeft_To_BottomRight(){
+      for(var x = 0; x < board_col; x++){ //rows top
+      	rows = 0;
+      	cols = x;
+      	var connected = 1;
+
+      	for (var i = 0; i < board_row; i++) {
+      		if(cols >= board_col-1 || rows >= board_row-1) continue;
+      		else if(board[cols][rows] == board[cols+1][rows+1] && board[cols][rows] != 0) connected++;
+      		else connected = 1;
+      		rows++;
+      		cols++;
+      	}
+		if(connected >= target-1) {
+      		if(rows < board_row-1 && cols <= board_col-1){
+      			if(board[cols][rows] == 0 && board[cols][rows+1] != 0) return cols;
+      		}
+      		else if(rows == board_row-1 && cols <= board_col-1){
+      			if(board[cols][rows] == 0) return cols;
+      		}
+      		if(cols >= 3 && rows >= 3){
+      			if(board[cols-3][rows-3] == 0){
+      				if(board[cols-3][rows-2] != 0) return cols-3;
+      			}
+      		}
+      	 }
+      }
+
+      for(var x = 0; x < board_row; x++){ //rows top
+      	rows = x;
+      	cols = 0;
+      	var connected = 1;
+
+      	for (var i = 0; i < board_col; i++) {
+      		if(cols >= board_col-1 || rows >= board_row-1) continue;
+      		else if(board[cols][rows] == board[cols+1][rows+1] && board[cols][rows] != 0) connected++;
+      		else connected = 1;
+      		rows++;
+      		cols++;
+      	}
+
+		if(connected >= target-1) {
+      		if(rows < board_row-1 && cols <= board_col-1){
+      			if(board[cols][rows] == 0 && board[cols][rows+1] != 0) return cols;
+      		}
+      		else if(rows == board_row-1 && cols <= board_col-1){
+      			if(board[cols][rows] == 0) return cols;
+      		}
+      		if(cols >= 3 && rows >= 3){
+      			if(board[cols-3][rows-3] == 0){
+      				if(board[cols-3][rows-2] != 0) return cols-3;
+      			}
+      		}
+      	 }
+      }
+      return -1;
+  }
+
+   function move_in_col(col_to_move){
+   	if(gameOver == true) return;
+  		var col_num = col_to_move;
+  		var num_turn = 1;
+  		if(turn == "black") num_turn = 2;
+
+
+  	for (var i = 0; i < board_row; i++) {
+  		if(board[col_num][i] != 0 && i == 0) {
+  			return -10;
+  		}
+  		else if(i == board_row-1 && board[col_num][i] == 0) {
+  			board[col_num][i] = num_turn;
+  			break;
+  		}
+  		else if(board[col_num][i] != 0){
+  			board[col_num][i-1] = num_turn;
+  			break;
+  		}
+  	}
+  	var image = "";
+  	for (var x = 0; x < board_row; x++) {
+  		if(board[col_num][x] == 1) image += '<img class="square" id="square" src="square.png" alt="board" style="background-color: red"><br>';
+  		else if(board[col_num][x] == 2) image += '<img class="square" id="square" src="square.png" alt="board" style="background-color: black"><br>';
+  		else image += '<img class="square" id="square" src="square.png" alt="board" style="background-color: transparent"><br>';
+  	}
+  	var elem = "board" + col_num.toString();
+  	document.getElementById(elem).innerHTML = image;
+
+  		if(checkWin()) return won();
+
+       //check tie
+       var tie = true;
+       for(var x = 0; x < board_row; x++){
+       	for (var i = 0; i < board_col; i++) {
+       		if(board[i][x] == 0) {
+       			tie = false;
+       		}
+       	}
+       }
+       if(tie == true) tie_game();
+
+       	turn = "red";
+       	document.getElementById('red-player').style.backgroundColor = '#ffcccc';
+       	document.getElementById('black-player').style.backgroundColor = 'white';
+       	document.getElementById('your_turn').style.display = 'block';
+
+
+   }
+
+   function won(){
+   	var win_message = '<h1 style="color:'+turn+';"> the ' + turn +  ' player won </h1><br><br><button type="button" onclick="play()">Play Again</button>';
+   	var message_recipient = "win_message_" + turn;
+   	document.getElementById(message_recipient).style.display = 'block';
+   	document.getElementById(message_recipient).innerHTML = win_message;
+   	document.getElementById('your_turn').style.display = 'none';
+   	gameOver = true;
+   }
+
+   function tie_game(){
+   	document.getElementById("win_message").style.display = 'block';
+   	document.getElementById('turn').style.display = 'none';
+   	var tie_message = '<h1> it was a tie </h1><br><br><button type="button" onclick="play()">Play Again</button>';
+   	document.getElementById("win_message").innerHTML = tie_message;
+   	document.getElementById('your_turn').style.display = 'none';
+   	gameOver = true;
+   }
+
+   function play() {
+   	document.getElementById('board').style.display = 'none';
+   	document.getElementById('settings').style.display = 'block';
+   	document.getElementById('win_message_red').style.display = 'none';
+   	document.getElementById('win_message_black').style.display = 'none';
+   	document.getElementById('icon1').style.display = 'none';
+   	document.getElementById('icon2').style.display = 'none';
+   	document.getElementById('red-player').style.backgroundColor = 'white';
+   	document.getElementById('black-player').style.backgroundColor = 'white';
+   }
+
+   function pick_starter(){
+   		randomNumber = getRand(10, 40);
+   		flipper = randomNumber%2;
+	   	animation(0, randomNumber);
+   }
+
+   function animation(index, time){
+   	flip_player()
+   	if(index != time) setTimeout(animation, 100, index+1, time)
+   	else {
+   		document.getElementById('board').style.display = 'block';
+   		document.getElementById('choosing_player').style.display = 'none';
+   		if(num_players == 1 && turn == "black") {
+   			player_finished = false;
+   			setTimeout(computer_move, 1000);
+   		}
+   		else if(num_players == 1) document.getElementById('your_turn').style.display = 'block';
+   	}
+   }
+
+   function flip_player(){
+   	if(turn == "red") {
+   		turn = "black";
+   		document.getElementById('red-player').style.backgroundColor = 'white';
+   		document.getElementById('black-player').style.backgroundColor = '#d9d9d9';
+   	}
+   	else {
+   		turn = "red";
+   		document.getElementById('red-player').style.backgroundColor = '#ffcccc';
+   		document.getElementById('black-player').style.backgroundColor = 'white';
+   	}
+   }
+
+   function getRand(minValue, maxValue) {
+   	range = maxValue - minValue;
+   	n = Math.random() * range + minValue;
+   	n = parseInt(n);
+   	return n;
+   }
+
+</script>
+
+
+
+
+
+</body>
+</html>
