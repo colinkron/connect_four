@@ -12,7 +12,10 @@ const MONGO_URL = "mongodb+srv://colinjames1:jamescolin1@cluster0-ztasy.mongodb.
 // const MONGO_URL = `mongodb://localhost:27017/${DATABASE_NAME}`;
 
 const mongoose = require("mongoose");
-mongoose.connect(MONGO_URL, {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose
+	.connect(MONGO_URL, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
+	.then(() => console.log( 'Database Connected' ))
+	.catch(err => console.log( err ));
 
 let db = null;
 let collection = null;
