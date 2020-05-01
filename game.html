@@ -80,14 +80,14 @@
 			elem.style.backgroundColor = "transparent";
 		}
 
-		initalizeBoard();
+		initializeBoard();
 	</script>
 	<!-- onmouseover="document.body.style.backgroundColor ='orange'" -->
 
 </head>
 <body>
 	<h1 align="center"> Connect Four </h1>
-
+	<h2 align="center" id="test"> </h2>
 	<div id="settings">
 		<h3 align="center"> Game Settings: </h3>
 		<form name="settings" class="settings" style="display: block">
@@ -133,8 +133,30 @@
 	<br><br><br><br>
 	<div id="print_board" align="center" style="width: 100%; display: block"> </div>
 
+<!-- ///////////// -->
 	<script type="text/javascript">
-		function initalizeBoard(){
+
+	function getUrlParameter(name) {
+					name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+					var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+					var results = regex.exec(location.search);
+					return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+				}
+
+	function loginAlert() {
+				var username = getUrlParameter("username");
+				console.log(username);
+				if (username != undefined)
+				document.getElementById("test").innerHTML = "Welcome, " + username;
+				}
+
+        loginAlert();
+			</script>
+
+<!-- ////// -->
+
+	<script type="text/javascript">
+		function initializeBoard(){
 			board = new Array(board_col);
 
 			for (var i = 0; i < board_col; i++) {
@@ -148,6 +170,9 @@
 		}
 
 		function buildBoardImage() {
+
+			document.getElementById("test").innerHTML = "";
+
 			board_col = parseInt(document.settings.column_number.value);
 			board_row = parseInt(document.settings.row_number.value);
 			target = parseInt(document.settings.target.value);
@@ -167,7 +192,7 @@
 
 	document.getElementById('board').style.display = 'none';
 
-      initalizeBoard();
+      initializeBoard();
 
       gameOver = false;
 

@@ -1,4 +1,9 @@
 <!-- Contains HTML and the Javascript for the form data
+
+1:12pm:https://stackoverflow.com/questions/17863986/is-there-a-way-to-pass-javascript-variables-in-url
+for coding the url....
+
+
  -->
 <!DOCTYPE html>
 <html>
@@ -12,25 +17,23 @@
 <body onload="getImage(true, false)">
 
   <div class="main">
-    <p class="sign" align="center">Sign in</p>
-    <form method="POST" name="form" action="https://colinkron.github.io/connect_four/game.html">
+    <p class="sign" align="center">Sign in </p>
+    <form method="POST" name="form" action="/game">
       <input class="field" type="text" name="username" placeholder="Username" required>
-      <input class="field" type="text" name="password" placeholder="Password" required>
+      <!-- <input class="field" type="text" name="password" placeholder="Password" required> -->
       <input class="field" type="text" name="image" placeholder="Your Image" onchange="return getImage(false, false)" required>
-      <input type="submit" set="Sign In" ></input>
+      <input type="submit" class="submit" set="Sign In" action ></input>
       <p class="linker" align="center"><a href="https://spencergallant.github.io/comp20_api/">Reference for the Image API</a></p>
     </form>
 
 
 
   </div>
-    <p class = "text" id = "note">Your Profile Picture based off of Your Image Keyword : </p> <br/>
+    <p class = "text" id = "note">Your game background based on your image keyword </p> <br/>
     <div class="picture" id = "picture"></div> <br/>
     <p class = "image" id = "image"> </p> <br/>
 
   <script>
-
-
       //----------------------IMAGE CODE--------------------//
       numImage = 0;
       previousWord = "image";
