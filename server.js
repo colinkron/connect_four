@@ -40,6 +40,7 @@ app.post('/game', (req, res) => {
 			}
 
 			if (user) {
+				catch(error);
 				res.send(false);
 
 				// figure this out
