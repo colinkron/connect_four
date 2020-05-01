@@ -40,14 +40,9 @@ app.post('/game', (req, res) => {
 			}
 
 			if (user) {
-				catch (e) {}				
-				
 				res.send(false);
-
 				// figure this out
 				// this is for when the username already has been used before
-
-
 
 			} else {
 				console.log("Success: Signing you up...");
