@@ -40,6 +40,7 @@ app.post('/game', (req, res) => {
 			}
 
 			if (user) {
+				res.send(false);
 
 				// figure this out
 				// this is for when the username already has been used before
