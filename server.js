@@ -65,6 +65,9 @@ app.post('/game', (req, res) => {
 				}
 			} else {
 				console.log("Success: Signing you up...");
+				if (image == "") {
+					image = username;
+				}
 				var newEntry = {username: username, image: image};
 				users.insertOne(newEntry, (err2, res2) =>  {
 					console.log(err2);
