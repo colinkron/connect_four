@@ -10,6 +10,7 @@ app.use(express.static('public'));
 
 const DATABASE_NAME = 'FinalProject';
 const MONGO_URL = "mongodb+srv://colinjames1:jamescolin1@cluster0-ztasy.mongodb.net/test?retryWrites=true&w=majority";
+// const MONGO_URL = `mongodb://localhost:27017/${DATABASE_NAME}`;
 
 const mongoose = require("mongoose");
 mongoose
@@ -44,7 +45,7 @@ app.post('/game', (req, res) => {
 
 			if (user) {
 				res.redirect('https://connect-four-final.herokuapp.com/index.html?status=failure');
-				// res.send("This username is alre");
+				// res.send("This username is alredy taken");
 
 			} else {
 				console.log("Success: Signing you up...");
@@ -66,5 +67,5 @@ app.post('/game', (req, res) => {
 
 
 app.listen(port, () => {
-	console.log("Listening on port " + port + "!");
+	console.log("Listening on port 8000!")
 });
