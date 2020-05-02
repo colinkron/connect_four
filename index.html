@@ -1,0 +1,105 @@
+<!-- Contains HTML and the Javascript for the form data
+
+1:12pm:https://stackoverflow.com/questions/17863986/is-there-a-way-to-pass-javascript-variables-in-url
+for coding the url....
+
+
+ -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="apistyle.css">
+    <title>Sign in Page</title>
+    <!-- <script src="script.js"></script> -->
+</head>
+
+<body onload="getImage(true, false)">
+
+  <div class="main">
+    <p class="sign" align="center">Sign in </p>
+    <p style="text-align:center;font-size:12px;" id="fail"> </p>
+    <form method="POST" name="form" action="/game">
+      <input class="field" type="text" name="username" placeholder="Username" required>
+      <!-- <input class="field" type="text" name="password" placeholder="Password" required> -->
+      <input class="field" type="text" name="image" placeholder="Your Image" onchange="return getImage(false, false)" required>
+      <input type="submit" class="submit" set="Sign In" action ></input>
+      <p class="linker" align="center"><a href="https://spencergallant.github.io/comp20_api/">Reference for the Image API</a></p>
+    </form>
+
+
+
+  </div>
+    <p class = "text" id = "note">Your game background based on your image keyword </p> <br/>
+    <div class="picture" id = "picture"></div> <br/>
+    <p class = "image" id = "image"> </p> <br/>
+
+  <script type="text/javascript">
+
+      //----------------------IMAGE CODE--------------------//
+      numImage = 0;
+      previousWord = "image";
+      function getImage(default_image, retry) {
+        if(default_image) word = "image";
+        else if(retry) word = "retry";
+        else word = document.form.image.value;
+
+        if(previousWord == word) numImage = numImage + 1;
+        else numImage = 0;
+
+        previousWord = word;
+
+        request = new XMLHttpRequest();
+        request.open("GET", "https://pixabay.com/api/?key=15909759-b4111d3c13a2b72bb3717136f&q=" + word, true);
+
+        request.onreadystatechange = function() {
+          if (request.readyState == 4 && request.status == 200) {
+            result = request.responseText;
+            // alert(result);
+            imageData = JSON.parse(result);
+            if(imageData["totalHits"] == 0) {
+              alert("There are no results for this search");
+              getImage(false, true);
+              return 0;
+            }
+            if(numImage == imageData["totalHits"]) {
+              alert("You have gone through all images with this word. Starting image results over.");
+              numImage = 0;
+            }
+            document.getElementById("picture").innerHTML ="<img class='picture' src='" + imageData["hits"][numImage]["webformatURL"] + "'>";
+            var image_name = imageData["hits"][numImage]["webformatURL"];
+            document.getElementById("image").innerHTML = image_name;
+          }
+          else if (request.readyState == 4 && request.status != 200) {
+            document.getElementById("picture").innerHTML = "Something is wrong!  Check the logs to see where this went off the rails";
+          }
+          else if (request.readyState == 3) {
+            document.getElementById("picture").innerHTML = "Too soon!  Try again";
+          }
+        }
+      request.send();
+      }
+
+      // parsing!
+
+      function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+          }
+
+    function usernameTaken() {
+          var failure = getUrlParameter("status");
+         // console.log(failure);
+
+          if (failure){
+              document.getElementById("fail").innerHTML = "Username taken. Enter a new one.";
+          }
+      }
+
+          usernameTaken();
+
+    </script>
+  </body>
+</html>

@@ -14,8 +14,8 @@ const MONGO_URL = "mongodb+srv://colinjames1:jamescolin1@cluster0-ztasy.mongodb.
 const mongoose = require("mongoose");
 mongoose
 	.connect(MONGO_URL, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
-	.then(() => console.log( 'Database Connected' ))
-	.catch(err => console.log( err ));
+	// .then(() => console.log( 'Database Connected' ))
+  // .catch(err => console.log( err ))
 
 let db = null;
 let collection = null;
@@ -26,7 +26,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.post('/game', (req, res) => {
 	MongoClient.connect(MONGO_URL, { useUnifiedTopology: true }, (err, db) => {
 			if (err) {
-					console.log("Error: Connecting to MongoDB.");
+					console.log("Error.");
 					res.statusCode = 404;
 			}
 		var dbase = db.db('FinalProject')
@@ -43,9 +43,8 @@ app.post('/game', (req, res) => {
 			}
 
 			if (user) {
-				res.send(false);
-				// figure this out
-				// this is for when the username already has been used before
+				res.redirect('http://localhost:8000/index.html?status=failure');
+				// res.send("This username is alre");
 
 			} else {
 				console.log("Success: Signing you up...");
