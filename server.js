@@ -10,7 +10,6 @@ app.use(express.static('public'));
 
 const DATABASE_NAME = 'FinalProject';
 const MONGO_URL = "mongodb+srv://colinjames1:jamescolin1@cluster0-ztasy.mongodb.net/test?retryWrites=true&w=majority";
-// const MONGO_URL = `mongodb://localhost:27017/${DATABASE_NAME}`;
 
 const mongoose = require("mongoose");
 mongoose
@@ -44,7 +43,7 @@ app.post('/game', (req, res) => {
 			}
 
 			if (user) {
-				res.redirect('http://localhost:8000/index.html?status=failure');
+				res.redirect('http://localhost:3000/index.html?status=failure');
 				// res.send("This username is alre");
 
 			} else {
@@ -57,7 +56,7 @@ app.post('/game', (req, res) => {
 						res.send(false);
 					} else {
 							console.log("Success: Sign up complete.");
-							res.redirect('http://localhost:8000/game.html?username=' + username + '&image=' + image);
+							res.redirect('http://localhost:3000/game.html?username=' + username + '&image=' + image);
 						}
 					});
 				}
@@ -67,5 +66,4 @@ app.post('/game', (req, res) => {
 
 
 app.listen(port, () => {
-	console.log("Listening on port 8000!")
 });
