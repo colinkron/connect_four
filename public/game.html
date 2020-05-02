@@ -60,6 +60,16 @@
 			font-size: 15px;
 			font-weight: bold;
 		}
+		.picture {
+			border-radius: 5em;
+			min-height: 75px;
+			max-height:75px;
+			min-width: 75px;
+			max-width: 75px;
+			display: block;
+			margin-left: 50%;
+			width: 50%;
+		}
 	</style>
 
 
@@ -80,6 +90,7 @@
 		function hideCol(elem) {
 			elem.style.backgroundColor = "transparent";
 		}
+
 
 		initializeBoard();
 	</script>
@@ -115,9 +126,9 @@
 	</div>
 	<div>
 		<div class="column" id="red-player">
-			<div class = "icon" id = "icon1" style="float: left; margin-left: 10%; display: none;"><img src="red_icon.png" alt="board" style="width: 20%"></div><br>
+			<div class = "icon" id = "icon1" style="float: left; margin-left: 10%; display: none;"><div id = "red_icon" style="text-align: center;"><img src="red_icon.png" alt="board" style="width: 20%"></div></div><br>
 			<div class = "winner" id="win_message_red"></div>
-			<div class = "your_turn" id="your_turn" style="text-align: center; display: none; font-size: 10px;"><br>Your Turn</div>
+			<div class = "your_turn" id="your_turn" style="text-align: center; display: none; font-size: 10px;"></div>
 		</div>
 		<div class="column" style="width: 70%">
 			<div class = "board" id="board"></div>
@@ -133,7 +144,8 @@
 
 	<br><br><br><br>
 	<div id="print_board" align="center" style="width: 100%; display: block"> </div>
-
+	<div class="picture" name = "picture" id = "picture"></div> <br/>
+	<p class = "image" name= "image" id = "image"> </p> <br/>
 <!-- ///////////// -->
 	<script type="text/javascript">
 
@@ -150,8 +162,33 @@
 				if (username != undefined)
 				document.getElementById("test").innerHTML = "Welcome, " + username;
 				// get the board/entire screen or some spot at the top...write in the image.
-				}
+				getImage(image_url, false);
 
+				}
+			function getImage(word, retry) {
+	        request = new XMLHttpRequest();
+	        request.open("GET", "https://pixabay.com/api/?key=15909759-b4111d3c13a2b72bb3717136f&q=" + word, true);
+
+	        request.onreadystatechange = function() {
+	          if (request.readyState == 4 && request.status == 200) {
+	            result = request.responseText;
+	            // alert(result);
+	            imageData = JSON.parse(result);
+	            if(imageData["totalHits"] == 0) {
+	              alert("There are no results for this search");
+	              getImage(false, true);
+	              return 0;
+	            }
+	            document.getElementById("red_icon").innerHTML ="<img class='picture' src='" + imageData["hits"][0]["webformatURL"] + "'>";
+	           	var player_icon = imageData["hits"][0]["webformatURL"];
+
+	          }
+	          else if (request.readyState == 4 && request.status != 200) {
+	            document.getElementById("picture").innerHTML = "Something is wrong!  Check the logs to see where this went off the rails";
+	          }
+	        }
+	      request.send();
+	      }
         loginAlert();
 			</script>
 
@@ -173,7 +210,6 @@
 
 		function buildBoardImage() {
 
-			document.getElementById("test").innerHTML = "";
 
 			board_col = parseInt(document.settings.column_number.value);
 			board_row = parseInt(document.settings.row_number.value);
@@ -184,7 +220,12 @@
 				alert("Error: Goal to Win must be smaller than size of board");
 				return;
 			}
+			else if(board_col < 5 || 5 > board_row) {
+				alert("Error: Board col and row must be at least 5");
+				return;
+			}
 
+			document.getElementById("test").innerHTML = "";
       document.getElementById('settings').style.display = 'none'; //hide form
       pick_starter();
       // document.getElementById('red-player').style.backgroundColor = '#ffcccc';
@@ -365,7 +406,7 @@
   	document.getElementById(elem.id).innerHTML = image;
 
   	if(checkWin()) return won();
-       var tie = true;
+       var tie = true
        for(var x = 0; x < board_row; x++){
        	for (var i = 0; i < board_col; i++) {
        		if(board[i][x] == 0) {
@@ -373,7 +414,7 @@
        		}
        	}
        }
-       if(tie == true) tie_game();
+       if(tie) return tie_game();
 
        if(turn == "red") {
        	turn = "black";
@@ -393,7 +434,7 @@
    }
 
    function computer_move(){
-   		var col_to_move = getRand(1, board_col);
+   		var col_to_move = getRand(0, board_col);
    		if(defensive_vertical(1) != -1) {
    			col_to_move = defensive_vertical(1);
    		}
@@ -622,7 +663,7 @@
        		}
        	}
        }
-       if(tie == true) tie_game();
+       if(tie == true)return tie_game();
 
        	turn = "red";
        	document.getElementById('red-player').style.backgroundColor = '#ffcccc';
@@ -633,7 +674,7 @@
    }
 
    function won(){
-   	var win_message = '<h1 style="color:'+turn+';"> the ' + turn +  ' player won </h1><br><br><button type="button" onclick="play()">Play Again</button>';
+   	var win_message = '<h1 style="color:'+turn+';"><br> Winner! </h1><br><br><button type="button" onclick="play()">Play Again</button>';
    	var message_recipient = "win_message_" + turn;
    	document.getElementById(message_recipient).style.display = 'block';
    	document.getElementById(message_recipient).innerHTML = win_message;
@@ -642,10 +683,13 @@
    }
 
    function tie_game(){
-   	document.getElementById("win_message").style.display = 'block';
-   	document.getElementById('turn').style.display = 'none';
-   	var tie_message = '<h1> it was a tie </h1><br><br><button type="button" onclick="play()">Play Again</button>';
-   	document.getElementById("win_message").innerHTML = tie_message;
+   	document.getElementById("win_message_red").style.display = 'block';
+		document.getElementById("win_message_black").style.display = 'block';
+   	var tie_message = '<h1> <br>it was a tie </h1><br><br><button type="button" onclick="play()">Play Again</button>';
+   	document.getElementById("win_message_red").innerHTML = tie_message;
+		document.getElementById("win_message_black").innerHTML = tie_message;
+		document.getElementById('red-player').style.backgroundColor = '#ffcccc';
+		document.getElementById('black-player').style.backgroundColor = '#d9d9d9';
    	document.getElementById('your_turn').style.display = 'none';
    	gameOver = true;
    }
@@ -675,7 +719,7 @@
    		document.getElementById('choosing_player').style.display = 'none';
    		if(num_players == 1 && turn == "black") {
    			player_finished = false;
-   			setTimeout(computer_move, 1000);
+   			setTimeout(computer_move, 500);
    		}
    		else if(num_players == 1) document.getElementById('your_turn').style.display = 'block';
    	}

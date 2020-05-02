@@ -74,6 +74,16 @@ input[type="submit"].submit:hover {
    padding-top: 15px;
 }
 
+.disclaimer {
+  padding-top: 10px;
+  font-size: 10px;
+  color: #808080;
+  text-align: center;
+  line-height: 2;
+}
+
+
+
 .text {
    color: white;
    margin-left: 300px;
