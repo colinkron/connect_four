@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 
 const app = express();
 const jsonParser = bodyParser.json();
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 5000;
 
 app.use(express.static('public'));
 
@@ -43,7 +43,7 @@ app.post('/game', (req, res) => {
 			}
 
 			if (user) {
-				res.redirect('http://localhost:3000/index.html?status=failure');
+				res.redirect('http://localhost:5000/index.html?status=failure');
 				// res.send("This username is alre");
 
 			} else {
@@ -56,7 +56,7 @@ app.post('/game', (req, res) => {
 						res.send(false);
 					} else {
 							console.log("Success: Sign up complete.");
-							res.redirect('http://localhost:3000/game.html?username=' + username + '&image=' + image);
+							res.redirect('http://localhost:5000/game.html?username=' + username + '&image=' + image);
 						}
 					});
 				}
@@ -66,5 +66,5 @@ app.post('/game', (req, res) => {
 
 
 app.listen(port, () => {
-	console.log("Listening on port 3000!");
+	console.log("Listening on port " + port + "!");
 });
