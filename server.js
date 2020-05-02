@@ -43,7 +43,7 @@ app.post('/game', (req, res) => {
 			}
 
 			if (user) {
-				res.redirect('http://localhost:3000/index.html?status=failure');
+				res.redirect('https://connect-four-final.herokuapp.com/index.html?status=failure');
 				// res.send("This username is alre");
 
 			} else {
@@ -56,7 +56,7 @@ app.post('/game', (req, res) => {
 						res.send(false);
 					} else {
 							console.log("Success: Sign up complete.");
-							res.redirect('http://localhost:3000/game.html?username=' + username + '&image=' + image);
+							res.redirect('https://connect-four-final.herokuapp.com/game.html?username=' + username + '&image=' + image);
 						}
 					});
 				}
