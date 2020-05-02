@@ -34,7 +34,7 @@ app.post('/game', (req, res) => {
 	 	var users = dbase.collection('login')
 
 		var username = req.body.username;
-		var image = req.body.image; //need to access the picture link!!!!
+		var image = req.body.image;
 
 		users.findOne({username:username}, (err, user) => {
 			console.log(err);
@@ -43,10 +43,26 @@ app.post('/game', (req, res) => {
 				res.send(false);
 			}
 
+			//old user
 			if (user) {
-				res.redirect('https://connect-four-final.herokuapp.com/index.html?status=failure');
-				// res.send("This username is alredy taken");
-
+				//old user, old photo
+				if(image == "") {
+					var query = {username:username};
+					users.find(query).toArray(function(err, result) {
+						if (err) throw err;
+						image = result[0].image;
+						console.log(image);
+						res.redirect('https://connect-four-final.herokuapp.com/game.html?username=' + username + '&image=' + image);
+					});
+					// old user, new photo
+				} else {
+					var myquery = {username:username};
+					var newvalues = {$set: {image: image}};
+					users.updateOne(myquery, newvalues, function(err, result){
+						if(err) throw err;
+					});
+					res.redirect('https://connect-four-final.herokuapp.com/game.html?username=' + username + '&image=' + image);
+				}
 			} else {
 				console.log("Success: Signing you up...");
 				var newEntry = {username: username, image: image};
@@ -67,5 +83,5 @@ app.post('/game', (req, res) => {
 
 
 app.listen(port, () => {
-	console.log("Listening on port 8000!")
+	console.log("Listening on port!" + port);
 });
