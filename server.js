@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 
 const app = express();
 const jsonParser = bodyParser.json();
+var port = process.env.PORT || 3000;
 
 app.use(express.static('public'));
 
@@ -33,7 +34,7 @@ app.post('/game', (req, res) => {
 	 	var users = dbase.collection('login')
 
 		var username = req.body.username;
-		// var password = req.body.password;
+		var image = req.body.image; //need to access the picture link!!!!
 
 		users.findOne({username:username}, (err, user) => {
 			console.log(err);
@@ -48,7 +49,7 @@ app.post('/game', (req, res) => {
 
 			} else {
 				console.log("Success: Signing you up...");
-				var newEntry = {username: username};
+				var newEntry = {username: username, image: image};
 				users.insertOne(newEntry, (err2, res2) =>  {
 					console.log(err2);
 					if (err2) {
@@ -56,7 +57,7 @@ app.post('/game', (req, res) => {
 						res.send(false);
 					} else {
 							console.log("Success: Sign up complete.");
-							res.redirect('http://localhost:8000/game.html?username=' + username);
+							res.redirect('http://localhost:8000/game.html?username=' + username + '&image=' + image);
 						}
 					});
 				}
@@ -65,6 +66,6 @@ app.post('/game', (req, res) => {
 });
 
 
-app.listen(8000, () => {
+app.listen(port, () => {
 	console.log("Listening on port 8000!")
 });

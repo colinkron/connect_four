@@ -8,7 +8,10 @@ body {
     font-size: 0px;
 }
 
-.main {
+#fail {
+  color: red;
+}
+#main {
    background-color: #FFFFFF;
    width: 400px;
    height: 400px;
@@ -17,10 +20,17 @@ body {
 }
 
 .sign {
-   padding-top: 40px;
+  padding-top:20px;
    color: #1243ff;
    font-weight: bold;
-   font-size: 23px;
+   font-size: 22px;
+}
+
+.sign-smaller {
+   color: #FF1243;
+   font-weight: bold;
+   padding-bottom: 10px;
+   font-size: 12px;
 }
 
 .field {

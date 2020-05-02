@@ -11,12 +11,11 @@ for coding the url....
     <meta charset="utf-8">
     <link rel="stylesheet" href="apistyle.css">
     <title>Sign in Page</title>
-    <!-- <script src="script.js"></script> -->
 </head>
 
 <body onload="getImage(true, false)">
 
-  <div class="main">
+  <div id="main">
     <p class="sign" align="center">Sign in </p>
     <p style="text-align:center;font-size:12px;" id="fail"> </p>
     <form method="POST" name="form" action="/game">
@@ -31,8 +30,8 @@ for coding the url....
 
   </div>
     <p class = "text" id = "note">Your game background based on your image keyword </p> <br/>
-    <div class="picture" id = "picture"></div> <br/>
-    <p class = "image" id = "image"> </p> <br/>
+    <div class="picture" name = "picture" id = "picture"></div> <br/>
+    <p class = "image" name= "image" id = "image"> </p> <br/>
 
   <script type="text/javascript">
 

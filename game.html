@@ -8,6 +8,7 @@
 			background-color: white;
 			margin: 0;
 			padding: 0;
+			font-family: 'Verdana', sans-serif
 		}
 		* {
 			box-sizing: border-box;
@@ -86,8 +87,8 @@
 
 </head>
 <body>
-	<h1 align="center"> Connect Four </h1>
-	<h2 align="center" id="test"> </h2>
+	<h1 align="center" style="color: #ff0000;"> Connect Four </h1>
+	<h3 align="center" style="color: #00008b;" id="test"> </h3>
 	<div id="settings">
 		<h3 align="center"> Game Settings: </h3>
 		<form name="settings" class="settings" style="display: block">
@@ -145,9 +146,10 @@
 
 	function loginAlert() {
 				var username = getUrlParameter("username");
-				console.log(username);
+				var image_url = getUrlParameter("image"); 															// Get this, then document.write it underneath the gameboard???
 				if (username != undefined)
 				document.getElementById("test").innerHTML = "Welcome, " + username;
+				// get the board/entire screen or some spot at the top...write in the image.
 				}
 
         loginAlert();
